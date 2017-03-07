@@ -42,7 +42,7 @@ function gsapPlayer(params) {
              Create the elements
   -------------------------------------------*/
 
-  var isPlaying = true,
+  var isPlaying = !playerTL.paused(),
       playerWidth, playerMargin, playerColor, iconColor;
   fullWidth ? playerWidth  = '99%'  : playerWidth  = '80%';
   fullWidth ? playerMargin = '0'    : playerMargin = '0 10%';
@@ -80,6 +80,12 @@ function gsapPlayer(params) {
     'class' : 'pause', 
     'fill'  :  iconColor, 
   });
+  
+  function updatePlayPause(){
+    isPlaying = !playerTL.paused();
+    TweenMax.to( isPlaying ? play : pause , 0.1, { opacity: 1 });
+    TweenMax.to( isPlaying ? pause : play , 0.1, { opacity: 0 });
+  }
 
   //speed button
   var speed = append('button', player);
@@ -189,43 +195,13 @@ function gsapPlayer(params) {
     playerTL.progress(0);
     playerTL.restart();
 
-    if (!isPlaying) {
-      TweenMax.to(play, 0.1, {
-        opacity: 0
-      });
-      TweenMax.to(pause, 0.1, {
-        opacity: 1
-      });
-      isPlaying = true;
-    }
+    updatePlayPause();
   });
 
   playpause.addEventListener('click', function() {
-    var play =  this.querySelector('svg.play'),
-        pause = this.querySelector('svg.pause');
-
-    if (isPlaying === true) {
-      TweenMax.to(play, 0.1, {
-        opacity: 1
-      });
-      TweenMax.to(pause, 0.1, {
-        opacity: 0
-      });
-
-      playerTL.pause();
-      isPlaying = false;
-
-    } else {
-      TweenMax.to(play, 0.1, {
-        opacity: 0
-      });
-      TweenMax.to(pause, 0.1, {
-        opacity: 1
-      });
-
-      slider.value == 100 ? playerTL.restart() : playerTL.resume();
-      isPlaying = true;
-    }
+    isPlaying = !playerTL.paused();
+    playerTL[ isPlaying ? 'pause' : 'play' ]();
+    updatePlayPause();
   });
 
 };
